@@ -287,8 +287,8 @@ EOF
         if ($event->getIO()->isDecorated()) {
             $console .= ' --ansi';
         }
-
-        $process = new Process($php.($phpArgs ? ' '.$phpArgs : '').' '.$console.' '.$cmd, null, null, null, $timeout);
+        $command = explode(' ', str_replace("'", "",$php.($phpArgs ? ' '.$phpArgs : '').' '.$console.' '.$cmd));
+        $process = new Process($command, null, null, null, $timeout);
         $process->run(function ($type, $buffer) use ($event) { $event->getIO()->write($buffer, false); });
         if (!$process->isSuccessful()) {
             throw new \RuntimeException(sprintf("An error occurred when executing the \"%s\" command:\n\n%s\n\n%s", ProcessExecutor::escape($cmd), self::removeDecoration($process->getOutput()), self::removeDecoration($process->getErrorOutput())));
@@ -307,7 +307,8 @@ EOF
             $useNewDirectoryStructure = ProcessExecutor::escape('--use-new-directory-structure');
         }
 
-        $process = new Process($php.($phpArgs ? ' '.$phpArgs : '').' '.$cmd.' '.$bootstrapDir.' '.$autoloadDir.' '.$useNewDirectoryStructure, getcwd(), null, null, $timeout);
+        $command = explode(' ', str_replace("'", "",$php.($phpArgs ? ' '.$phpArgs : '').' '.$cmd.' '.$bootstrapDir.' '.$autoloadDir.' '.$useNewDirectoryStructure));
+        $process = new Process($command, getcwd(),null, null, $timeout);
         $process->run(function ($type, $buffer) use ($event) { $event->getIO()->write($buffer, false); });
         if (!$process->isSuccessful()) {
             throw new \RuntimeException('An error occurred when generating the bootstrap file.');
